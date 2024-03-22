@@ -1,69 +1,71 @@
 %フォルダの中のデータをまとめて処理
 %動画ファイル・トラッキングファイルの名前はYYYYMMDD_N1_N2.mp4(.csv)とすること（N1:その日の何番目の撮影か、N2:サンプルナンバー）
-%情報ファイルの名前はYYYYMMDD_N2.csvとすること
+%情報ファイルの名前はYYYYMMDD_N1.csvとすること
 
-cd("C:\Users\no5ri\OneDrive - The University of Tokyo\フォルダ\大学\授業課題等\卒業研究\実験記録\フェロモン\UMAtracker\撮影2\20240118_1")
+function PlotTrajectory(Filename)
 
-MovieNum = string("20240118_1");
+%Filename = "20240114_1_1"
 
-%情報ファイルの読み取り
+dir0 = pwd;
+addpath(fullfile(dir0,"/Data"))
+MovieNum = extractBefore(Filename,11);
 
-Info = readtable(append(MovieNum, "-info.csv"));
-    Info(Info.Error==1,:)=[];
-SampleName = append(MovieNum, "_", string(Info.SampleNumber));
+
+Info = readtable(append("\Data\",MovieNum, "-info.csv"), 'VariableNamingRule', 'preserve');
 Pheromone = string(Info.Pheromone);
     Pheromone(ismissing(Pheromone)) = "なし";
 Walker = string(Info.Walker);
 PheroPlace = string(Info.PheroPlace);
     PheroPlace(ismissing(PheroPlace))="なし";
-N = height(Info);
+i = str2double(extractAfter(Filename, 11));
 
-%%それぞれのサンプルごとに回すプログラム
 
-for i = 1: N
+
+
+%% それぞれのサンプルごとに回すプログラム
+    %最後のフレームのファイルがあるなら省略
+    if exist(fullfile(dir0, "Data", append(Filename, "_LastFlame.png")))==0
         %動画から最後のフレームを抽出
-        Movie = VideoReader(append(SampleName(i), ".mp4"));
+        Movie = VideoReader("\Data\",append(Filename, ".mp4"));
         % 動画のフレーム数を取得
         num_frames = Movie.NumFrames;
         % 最後のフレームを読み込む
         last_frame = read(Movie, num_frames);
         % 最後のフレームを保存
-        imwrite(last_frame, append(SampleName(i), "_LastFlame.png"));
+        imwrite(last_frame, fullfile(dir0, "Data", append(Filename, "_LastFlame.png")));
+    else
+        last_frame = imread(fullfile(dir0, "Data", append(Filename, "_LastFlame.png")));
+    end
+
+
+    if Pheromone(i)==Walker(i)
+        SDN="(同巣)";
+    elseif Pheromone(i)=="なし"
+        SDN="";
+    else
+        SDN="(異巣)";
+    end
+    PositionFile = fullfile(dir0, "Data", append(Filename, "-position.csv"));    
+    position = readmatrix(string(PositionFile));
+    
+    F=figure(i);
+    imshow(last_frame);
+    hold on
+    plot(position(:,2),position(:,3),'r-','LineWidth',1);
+    txt = append(Filename, "  ",SDN );
+    txtcell = {txt, append("Pheromone: ", Pheromone(i), ", ", PheroPlace(i)), append("Walker: ", Walker(i)),};
+    t=text(10,100,txtcell,'interpreter','none');
+    t.FontSize = 20;
+    t.Color = [0.9,0.9,0.9];
     
     
-        if Pheromone(i)==Walker(i)
-            SorD="(同巣)";
-        elseif Pheromone(i)=="なし"
-            SorD="";
-        else
-            SorD="(異巣)";
-        end
-        Position = append(SampleName(i), "-position.csv");    
-        position = readmatrix(string(Position));
-        %info = "a";
-        
-        F=figure(i);
-        imshow(last_frame);
-        hold on
-        p=plot(position(:,2),position(:,3),'r-','LineWidth',1);
-        txt = append(SampleName(i), "  ",SorD );
-        txtcell = {txt, append("Pheromone: ", Pheromone(i), ", ", PheroPlace(i)), append("Walker: ", Walker(i)),};
-        t=text(10,100,txtcell,'interpreter','none');
-        t.FontSize = 20;
-        t.Color = [0.9,0.9,0.9];
-        
-        
-        PhotoFile = append(SampleName(i), "_Trajectory.png");
-        FigFile = append(SampleName(i), "_Trajectory.fig");
-        %exportgraphics(gcf,PhotoFile) 
-        saveas(F, PhotoFile)
-        saveas(F, FigFile) 
-        % pngで保存したものは画素数が変わってしまうため別プログラムで使用する際はfigファイルを利用すること。
-        % ※MATLABの画像上の座標はピクセル基準であるため、画素数が変わると座標もずれる
-        % 1280*720で保存！
-        
-        hold off
+    PhotoFile = fullfile(dir0, "Data", append(Filename, "_Trajectory.png"));
+    FigFile = fullfile(dir0, "Data", append(Filename, "_Trajectory.fig"));
+    %exportgraphics(gcf,PhotoFile) 
+    saveas(F, PhotoFile)
+    saveas(F, FigFile) 
+    % pngで保存したものは画素数が変わってしまうため別プログラムで使用する際はfigファイルを利用すること。
+    % ※MATLABの画像上の座標はピクセル基準であるため、画素数が変わると座標もずれる
+    
+    hold off
 end
-close all
-clear all
-cd ..
