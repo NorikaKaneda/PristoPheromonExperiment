@@ -1,29 +1,22 @@
-% 順番にファイルをめぐりEllipseCorrectionを実行する
-addpath("C:\Users\no5ri\OneDrive - The University of Tokyo\フォルダ\大学\授業課題等\卒業研究\実験記録\フェロモン\UMAtracker\撮影2\")
-%% 下位フォルダの名前を取得
-Folders = dir('202*');
-%% フォルダごとにループ
-Save = 1; %Save番目のフォルダから始める。途中からやりた
-% い場合に2以上を設定する
+% 順番にファイルをめぐりPheroAreaあるいはNonPheroAreaを実行する
 
-for i = Save:size(Folders,1)
-    Movienum = {Folders.name};
-    Movienum = string(Movienum(i));
-    % フォルダに移動
-    cd(Movienum)
-    % 情報を読み取る
-    Info = readtable(append(Movienum, "-info.csv"));
-        Info(Info.Error==1,:)=[];
-    %エラーじゃない場合のみループ
-    for j = 1:size(Info)
-        num = Info.SampleNumber(j);
-        Filename = append(Movienum, "_", string(num));
-        if ismissing(Info.Pheromone(j))
-            NonPheroArea(Filename);
-        else
-            PheroArea(Filename);
-        end
+dir0 = pwd;
+addpath(dir0)
+cd Data\
+
+%% 情報ファイルを読み込む
+
+Info = readtable("FileInformation.csv");
+
+%% 各撮影ファイルでPheroAreaあるいはNonPheroAreaを実行
+
+N = height(Info);
+for i = 1:N
+    if Info.SDN(i)=="N"
+        NonPheroArea(string(Info.FileName(i)))
+    else
+        PheroArea(string(Info.FileName(i)))
     end
-    cd ..\
-    close all
 end
+
+cd ..\
