@@ -3,11 +3,9 @@
 % 1 Trajectoryデータと縦線をプロット
 % 2 左側エリアへの滞在の有無を01で保存
 % 3 左側エリアへの滞在率を導出、グラフ化
+% 4 RotPositionファイルの作成
 
 function NonPheroArea(Filename)
-
-%Filename = "20240229_1_1";
-%cd("C:\Users\no5ri\OneDrive - The University of Tokyo\フォルダ\大学\授業課題等\卒業研究\実験記録\フェロモン\UMAtracker\撮影2\20240229_1")
 
 %% 1 Trajectoryデータと縦線をプロット
 Tracking = readmatrix(append(Filename, "-CorrPosition.csv"));
@@ -47,13 +45,23 @@ TrackPhero = Tracking(:,1)<0;
 writematrix(TrackPhero, append(Filename, "_TrackPhero.csv"));
 
 %% 3 左側エリアへの滞在率を導出、グラフ化
-Size = length(TrackPhero);
-figure
-plot(TrackPhero)
-ylim([-0.5,1.5])
-xlim([0,Size])
 
-disp("滞在率は")
-sum(TrackPhero)/Size
+StayRate(TrackPhero)
 
+%% 4 RotPositionファイルの作成
+writematrix(Tracking, append(Filename, "-RotPosition.csv"));
+
+end
+
+
+
+
+function StayRate(TrackPhero)
+    Size = length(TrackPhero);
+    figure
+    plot(TrackPhero)
+    ylim([-0.5,1.5])
+    xlim([0,Size])
+    disp("滞在率は")
+    sum(TrackPhero)/Size
 end
