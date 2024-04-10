@@ -1,0 +1,57 @@
+---
+  title: "CalculateAngle.Rmd"
+  output: html_document
+  date: "2024-04-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## ファイルの読み込み
+
+```{r Main}
+library('trajr')
+Info <- read.csv("Data/FileInformation.csv")
+Filenames = Info[,5]
+
+for (i in 1:length(Filenames)){
+  CalcAngle(Filenames[i])
+}
+
+#この後のチャンクを先に読み込んでください
+
+```
+
+a
+```{r CalcAngle}
+# データの読み込み
+# 計算
+# 保存
+
+DataCheck <- function(Position){
+  x <- unlist(Position[1])
+  y <- unlist(Position[2])
+  plot(x,y, type='l')
+}
+
+CalcAngle <- function(filename){
+  Position <- read.csv(paste("Data/",filename,"_CalcData.csv", sep=""))
+  #DataCheck(Position)
+  coords <- data.frame(
+    x <- unlist(Position[,1]),
+    y <- unlist(Position[,2]),
+    times <- 0:(length(x)-1)
+  )
+  trj <- TrajFromCoords(coords)
+  #plot(trj)
+  Angles <- TrajAngles(trj, lag=1, compass.direction=NULL)
+  #plot(Angles, type='l')
+  write.csv(Angles, file=paste("Data/",filename,"_angles.csv", sep="" ))
+  return(trj)
+}
+
+#a <- CalcAngle("20240114_1_1")
+
+
+```
