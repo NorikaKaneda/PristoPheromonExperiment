@@ -13,7 +13,6 @@ Filename = string(Filename);
 
 dir0 = pwd;
 addpath(fullfile(dir0,"/Data"))
-MovieNum = extractBefore(Filename,11);
 
 WholeInfo = readtable("FileInformation.csv");
 
