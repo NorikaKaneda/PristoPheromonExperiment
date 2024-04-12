@@ -5,7 +5,10 @@
 %       ThinOutFrame: 24フレームに1フレームだけ取り出し
 %       CalcDist: 中央からの距離を計算
 %       CalcSpeed: 移動速度を計算
-%       CalcTurn: 角度について計算
+
+% 作成するファイル
+%   _CalcData.csv: もろもろの計算結果をまとめたファイル
+%   _ThinOutxy.csv: 1/24に間引いただけの座標情報。角度など他の項目の計算に使う
 
 
 
@@ -32,25 +35,26 @@ function CalcData(Filename)
 
 
     %データの長さをそろえる
-    Position1s1f = Position1s1f(2:(length(Position1s1f)-1),:);
-    Phero01 = Phero01(2:length(Phero01)-1);
-    Distance = Distance(2:(length(Distance)-1),:);
-    Speed = Speed(1:(length(Speed)-1),:);
+    Position1s1f_cut = Position1s1f(2:(length(Position1s1f)-1),:);
+    Phero01_cut = Phero01(2:length(Phero01)-1);
+    Distance_cut = Distance(2:(length(Distance)-1),:);
+    Speed_cut = Speed(1:(length(Speed)-1),:);
 
     % 各種情報の付加
     Data = table;
-    Data.x = Position1s1f(:,1);
-    Data.y = Position1s1f(:,2);
-    Data.Phero01 = Phero01;
-    Data.Distance = Distance(:,1);
-    Data.InOut = Distance(:,2);
-    Data.Speed = Speed(:,1);
-    Data.GoStop = Speed(:,2);
+    Data.x = Position1s1f_cut(:,1);
+    Data.y = Position1s1f_cut(:,2);
+    Data.Phero01 = Phero01_cut;
+    Data.Distance = Distance_cut(:,1);
+    Data.InOut = Distance_cut(:,2);
+    Data.Speed = Speed_cut(:,1);
+    Data.GoStop = Speed_cut(:,2);
     %Data.TurnAngle = Turn(:,1);
     %Data.Turn = Turn(:,2);
 
     % ファイルの保存
-    writetable(Data, append(Filename, "CalcData.csv"));
+    writetable(Data, append(Filename, "_CalcData.csv"));
+    writematrix([Data.x, Data.y], append(Filename, "_ThinOutxy.csv"))
 
 end
 
@@ -81,7 +85,9 @@ function Dist = CalcDist(Data)
     end
 
     % 距離情報とInOut情報を結合
-    a = 5.5/7; % シャーレの内側何割を利用するか？
+    % シャーレの内側何割を利用するか？
+    %a = 5.5/7; 
+    a = 27.5/35; %外側3.75mmを除去する場合
     InOutTS = a*500;
 
     InOut01 = (Dist<InOutTS);
