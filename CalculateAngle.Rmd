@@ -15,8 +15,10 @@ library('trajr')
 Info <- read.csv("Data/FileInformation.csv")
 Filenames = Info[,5]
 
+TurnTS <- pi/4
+
 for (i in 1:length(Filenames)){
-  CalcAngle(Filenames[i])
+  CalcAngle(Filenames[i],TurnTS)
 }
 
 #この後のチャンクを先に読み込んでください
@@ -35,8 +37,8 @@ DataCheck <- function(Position){
   plot(x,y, type='l')
 }
 
-CalcAngle <- function(filename){
-  Position <- read.csv(paste("Data/",filename,"_CalcData.csv", sep=""))
+CalcAngle <- function(filename, TurnTS){
+  Position <- read.csv(paste("Data/",filename,"_ThinOutxy.csv", sep=""), header=FALSE)
   #DataCheck(Position)
   coords <- data.frame(
     x <- unlist(Position[,1]),
@@ -44,14 +46,18 @@ CalcAngle <- function(filename){
     times <- 0:(length(x)-1)
   )
   trj <- TrajFromCoords(coords)
-  #plot(trj)
-  Angles <- TrajAngles(trj, lag=1, compass.direction=NULL)
+  plot(trj)
+  Angle <- TrajAngles(trj, lag=1, compass.direction=NULL)
+  Turn <- as.numeric(abs(Angle)>TurnTS)
   #plot(Angles, type='l')
-  write.csv(Angles, file=paste("Data/",filename,"_angles.csv", sep="" ))
-  return(trj)
+  AngleData <- data.frame(
+    Angle,
+    Turn
+  )
+  write.csv(AngleData, file=paste("Data/",filename,"_angles.csv", sep="" ), row.names=FALSE)
 }
 
-#a <- CalcAngle("20240114_1_1")
+#a <- CalcAngle("20240114_1_1", pi/4)
 
 
 ```
