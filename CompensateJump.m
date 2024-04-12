@@ -1,16 +1,13 @@
-%% FileInformationファイルの読み込み
+%% FileInformationファイルの読み込み、CompensJump関数の実行
 
 cd Data\
 Info = readtable("FileInformation.csv");
-
-
-%% ファイルを順番に読み込みCompensJump関数を実行
-
 arrayfun(@CompensJump, Info.FileName)
-
 cd ..\
 
-%% CompensJump関数
+
+
+
 
 function CompensJump(Filename)
 
@@ -20,7 +17,7 @@ Filename = string(Filename);
 TS = 50;
 
 % position.csvの読み込み
-Position = readmatrix(append(Filename, "-CorrPosition.csv"));
+Position = readmatrix(append(Filename, "-RotPosition.csv"));
 
 % 補正の実行
 flag = 1; %ジャンプがあるときは1
