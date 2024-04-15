@@ -54,7 +54,7 @@ function CalcData(Filename)
 
     % ファイルの保存
     writetable(Data, append(Filename, "_CalcData.csv"));
-    writematrix([Data.x, Data.y], append(Filename, "_ThinOutxy.csv"))
+    writematrix(Position1s1f, append(Filename, "_ThinOutxy.csv"))
 
 end
 
