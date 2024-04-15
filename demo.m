@@ -23,7 +23,5 @@ run CalculationData.m
 run StayRate.m
 % 活動性に関する処理を行う
 run Activity.m
-% 移動速度に関する処理を行う
-run Speed.m
 % 方向転換に関する処理を行う
 run Turn.m
