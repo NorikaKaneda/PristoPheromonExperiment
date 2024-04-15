@@ -10,6 +10,7 @@ Info.InPhero = In_Phero_array;
 Info.InNonPhero = In_NonPhero_array;
 Info.InPheroGo = In_Phero_Go_array;
 Info.InNonPheroGo = In_NonPhero_Go_array;
+writetable(Info, "FileInformation.csv");
 
 % 使わない段の削除
 Info(Info.SDN=="N",:) = [];% においなしのもの
@@ -19,7 +20,7 @@ Info(Info.StayRate == 1 | Info.StayRate == 0, :) = [];% StayRateが1あるいは
 
 % グラフ・GLMM用テーブルの作成
 Info2 = table; % Info3を作るためのつなぎのテーブル
-Info2.Petri = Info.SampleNumber;
+Info2.Petri = (1:height(Info))';
 Info2.FileName = Info.FileName;
 Info2.SDN = Info.SDN;
 Info2.SDNnum = Info.SDNnum;
@@ -59,11 +60,13 @@ hold on
 % シャーレごとの平均をつなぐ
 for i = 1:height(Info3)/2
     if Info3.SDN{2*i}=='S'
-        plot([1,2],[Info3.GoRate(2*i-1), Info3.GoRate(2*i)], '-o', 'MarkerSize', 5, 'Color',[0.6, 0.6, 0.6])
+        plot([1,2],[Info3.GoRate(2*i-1), Info3.GoRate(2*i)], '-', 'MarkerSize', 5, 'Color',[0.6, 0.6, 0.6])
     elseif Info3.SDN{2*i}=='D'
-        plot([3,4],[Info3.GoRate(2*i-1), Info3.GoRate(2*i)], '-o', 'MarkerSize', 5, 'Color',[0.6, 0.6, 0.6])
+        plot([3,4],[Info3.GoRate(2*i-1), Info3.GoRate(2*i)], '-', 'MarkerSize', 5, 'Color',[0.6, 0.6, 0.6])
     end
 end
+% バブルチャートの作成
+bubblechart(Info3, "status", "GoRate", "Framenum",'MarkerFaceAlpha',0.10)
 
 % 平均値を+で表示
 plot([1;2;3;4], [mean(Info3.GoRate(Info3.status=="S1")), mean(Info3.GoRate(Info3.status=="S0")), mean(Info3.GoRate(Info3.status=="D1")), mean(Info3.GoRate(Info3.status=="D0"))], 'k+')
@@ -85,6 +88,9 @@ glme3 = fitglme(Info3, 'Gonum ~ 1 + Phero01          + (1|Petri) + (1|ColonyPair
 %glme4 = fitglme(GLMM_Speed_inner_Nonzero, 'GoNum ~ 1 + Area + SorD + (1|petri) + (1|ColonyPair) + (1 | Area:SorD)','Distribution', 'Binomial','BinomialSize',GLMM_Speed_inner_Nonzero.N, 'FitMethod', 'ApproximateLaplace')
 resultPhero = compare(glme2,glme1);
 resultSDN = compare(glme3,glme1);
+
+% データの保存
+writetable(Info3, "InfoForActivity.csv")
 
 cd ..\
 

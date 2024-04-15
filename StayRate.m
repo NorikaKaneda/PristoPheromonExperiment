@@ -80,6 +80,9 @@ glmeDN0 = fitglme(InfoDN, 'Staynum ~  -1 +          (1|ColonyPairnum) ', 'Distri
 glmeDN1 = fitglme(InfoDN, 'Staynum ~  -1 + SDNnum + (1|ColonyPairnum) ', 'Distribution', 'Binomial','BinomialSize',InfoDN.Framenum, 'FitMethod', 'ApproximateLaplace');
 resultsDN = compare(glmeDN0, glmeDN1);
 
+% データの保存
+writetable(Info, "InfoForStayRate.csv");
+
 
 
 cd ..\
