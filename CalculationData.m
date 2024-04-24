@@ -31,7 +31,6 @@ function CalcData(Filename)
     Phero01 = (Position1s1f(:,1) < 0);
     Distance = CalcDist(Position1s1f);
     Speed = CalcSpeed(Position1s1f);
-    %Turn = CalcTurn(Filename);
 
 
     %データの長さをそろえる
@@ -86,8 +85,9 @@ function Dist = CalcDist(Data)
 
     % 距離情報とInOut情報を結合
     % シャーレの内側何割を利用するか？
-    %a = 5.5/7; 
-    a = 27.5/35; %外側3.75mmを除去する場合
+    a = 5.5/7; 
+    %a = 27.5/35; %外側3.75mmを除去する場合
+    %a = 1/4 
     InOutTS = a*500;
 
     InOut01 = (Dist<InOutTS);
@@ -106,23 +106,7 @@ function Speed = CalcSpeed(Data)
     end
 
     % 移動速度情報とGoStop情報を結合
-    GoStopTS = 50;
+    GoStopTS = 71.4;
     GoStop01 = (Speed>GoStopTS);
     Speed = [Speed, GoStop01];
 end
-
-function Turn = CalcTurn(Filename)
-    % フォルダ中からangleファイルを読み出し、TurnStraight判定とともに返す
-
-    % 角度ファイルの読み込み
-    Data = readtable(append(Filename, "-angles.csv"), 'ReadRowNames',1);
-    Data = table2array(Data);
-    % 角度情報とTurn情報を結合
-    TurnTS = pi/4;
-    Turn01 = (arrayfun(@norm,Data)>TurnTS);
-    Turn = [Data, Turn01];
-end
-
-
-
-
