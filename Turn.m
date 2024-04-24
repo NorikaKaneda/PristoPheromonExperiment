@@ -70,6 +70,55 @@ title("歩行エリアと転向頻度の関係")
 xticklabels(categorical({'同巣においあり', '同巣においなし', '異巣においあり', '異巣においなし'}))
 hold off
 
+%% バブルプロット
+
+% データの準備
+for i = 1:height(Info3)
+    if Info3.status(i)=='S1'
+        Info3.statusnum(i) = 1;
+    elseif Info3.status(i)=="S0"
+        Info3.statusnum(i) = 2;
+    elseif Info3.status(i)=="D1"
+        Info3.statusnum(i) = 3;
+    elseif Info3.status(i)=="D0"
+        Info3.statusnum(i) = 4;
+    end
+end
+
+figure
+hold on
+
+% 中央値の表示
+med = zeros(4,1);
+for i = 1:4
+    med(i) = median(Info3.TurnRate(Info3.statusnum==i));
+    plot([i-0.4;i+0.4],[med(i);med(i)], 'k', 'LineWidth',2)
+end
+
+% シャーレごとの平均をつなぐ
+for i = 1:height(Info3)/2
+    if Info3.SDN{2*i}=='S'
+        plot([1,2],[Info3.TurnRate(2*i-1), Info3.TurnRate(2*i)], '-', 'MarkerSize', 5, 'Color',[0.8, 0.8, 0.8])
+    elseif Info3.SDN{2*i}=='D'
+        plot([3,4],[Info3.TurnRate(2*i-1), Info3.TurnRate(2*i)], '-', 'MarkerSize', 5, 'Color',[0.8, 0.8, 0.8])
+    end
+end
+% バブルプロット
+bc = bubblechart(Info3, "statusnum", "TurnRate", "Framenum",'MarkerFaceAlpha',0.10);
+bc.MarkerFaceColor = [0.3 0.3 0.3];
+bc.MarkerEdgeColor = [0.3 0.3 0.3];
+bubblesize([2 30])
+
+% 軸の設定
+xlim([0,5])
+xlabel("")
+xticks([1 2 3 4])
+xticklabels(categorical({'同巣においあり', '同巣においなし', '異巣においあり', '異巣においなし'}))
+ylabel("転向頻度")
+title("歩行エリアと転向頻度の関係")
+
+hold off
+
 %% GLMM
 
 % GLMM(Phero1vsPhero0)
