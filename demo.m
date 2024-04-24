@@ -25,3 +25,5 @@ run StayRate.m
 run Activity.m
 % 方向転換に関する処理を行う
 run Turn.m
+% 01/10計算
+run RetentionDefection.m
